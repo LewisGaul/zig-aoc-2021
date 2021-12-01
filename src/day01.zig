@@ -53,10 +53,39 @@ fn part2(input: Str) !u32 {
 }
 
 pub fn main() !void {
-    print("Part 1\n-------\n", .{});
-    print("Answer: {d}\n", .{try part1(data)});
-    print("Part 2\n-------\n", .{});
-    print("Answer: {d}\n", .{try part2(data)});
+    {
+        const start = std.time.nanoTimestamp();
+        const answer = try part1(data);
+        const end = std.time.nanoTimestamp();
+        print("Part 1\n-------\n", .{});
+        print("Answer: {d}\n", .{answer});
+        print(
+            "Took: {d} s, {d} ms, {d} us, {d} ns\n",
+            .{
+                @intToFloat(f64, end - start) / 1_000_000_000,
+                @intToFloat(f64, end - start) / 1_000_000,
+                @intToFloat(f64, end - start) / 1_000,
+                end - start,
+            },
+        );
+    }
+    {
+        const start = std.time.nanoTimestamp();
+        const answer = try part2(data);
+        const end = std.time.nanoTimestamp();
+        print("\n", .{});
+        print("Part 2\n-------\n", .{});
+        print("Answer: {d}\n", .{answer});
+        print(
+            "Took: {d} s, {d} ms, {d} us, {d} ns\n",
+            .{
+                @intToFloat(f64, end - start) / 1_000_000_000,
+                @intToFloat(f64, end - start) / 1_000_000,
+                @intToFloat(f64, end - start) / 1_000,
+                end - start,
+            },
+        );
+    }
 }
 
 test "1a" {
