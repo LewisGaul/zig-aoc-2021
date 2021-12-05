@@ -2,6 +2,7 @@ const std = @import("std");
 const print = std.debug.print;
 const ParseIntError = std.fmt.ParseIntError;
 
+const util = @import("util.zig");
 const data = @embedFile("../data/day01.txt");
 
 const Str = []const u8;
@@ -53,39 +54,9 @@ fn part2(input: Str) !u32 {
 }
 
 pub fn main() !void {
-    {
-        const start = std.time.nanoTimestamp();
-        const answer = try part1(data);
-        const end = std.time.nanoTimestamp();
-        print("Part 1\n-------\n", .{});
-        print("Answer: {d}\n", .{answer});
-        print(
-            "Took: {d} s, {d} ms, {d} us, {d} ns\n",
-            .{
-                @intToFloat(f64, end - start) / 1_000_000_000,
-                @intToFloat(f64, end - start) / 1_000_000,
-                @intToFloat(f64, end - start) / 1_000,
-                end - start,
-            },
-        );
-    }
-    {
-        const start = std.time.nanoTimestamp();
-        const answer = try part2(data);
-        const end = std.time.nanoTimestamp();
-        print("\n", .{});
-        print("Part 2\n-------\n", .{});
-        print("Answer: {d}\n", .{answer});
-        print(
-            "Took: {d} s, {d} ms, {d} us, {d} ns\n",
-            .{
-                @intToFloat(f64, end - start) / 1_000_000_000,
-                @intToFloat(f64, end - start) / 1_000_000,
-                @intToFloat(f64, end - start) / 1_000,
-                end - start,
-            },
-        );
-    }
+    try util.runPart(part1, data);
+    print("\n", .{});
+    try util.runPart(part2, data);
 }
 
 test "1a" {
