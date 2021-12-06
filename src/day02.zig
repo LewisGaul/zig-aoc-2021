@@ -1,44 +1,78 @@
 const std = @import("std");
-const Allocator = std.mem.Allocator;
-const List = std.ArrayList;
-const Map = std.AutoHashMap;
-const StrMap = std.StringHashMap;
-const BitSet = std.DynamicBitSet;
-const Str = []const u8;
+const assert = std.debug.assert;
+const print = std.debug.print;
+const ParseIntError = std.fmt.ParseIntError;
 
 const util = @import("util.zig");
-const gpa = util.gpa;
-
 const data = @embedFile("../data/day02.txt");
 
-pub fn main() !void {
-    
+const Str = []const u8;
+
+fn readLineNum(input: Str, idx: *usize) !u32 {
+    var start_idx: ?usize = null;
+    while (idx.* < input.len) : (idx.* += 1) {
+        switch (input[idx.*]) {
+            ' ' => {
+                start_idx = idx.* + 1;
+            },
+            '\n' => break,
+            else => continue,
+        }
+    }
+    assert(start_idx != null);
+    return std.fmt.parseUnsigned(u32, input[start_idx.?..idx.*], 10);
 }
 
-// Useful stdlib functions
-const tokenize = std.mem.tokenize;
-const split = std.mem.split;
-const indexOf = std.mem.indexOfScalar;
-const indexOfAny = std.mem.indexOfAny;
-const indexOfStr = std.mem.indexOfPosLinear;
-const lastIndexOf = std.mem.lastIndexOfScalar;
-const lastIndexOfAny = std.mem.lastIndexOfAny;
-const lastIndexOfStr = std.mem.lastIndexOfLinear;
-const trim = std.mem.trim;
-const sliceMin = std.mem.min;
-const sliceMax = std.mem.max;
+fn part1(input: Str) !u32 {
+    var depth: u32 = 0; // assuming depth can't go negative
+    var distance: u32 = 0;
 
-const parseInt = std.fmt.parseInt;
-const parseFloat = std.fmt.parseFloat;
+    // Let's use a quicker parsing method, directly stepping through chars.
+    var i: usize = 0;
+    while (i < input.len) : (i += 1) {
+        const direction: enum { Forward, Down, Up } = switch (input[i]) {
+            'f' => .Forward,
+            'd' => .Down,
+            'u' => .Up,
+            else => return error.UnexpectedChar,
+        };
+        const num = try readLineNum(input, &i);
+        switch (direction) {
+            .Forward => {
+                distance += num;
+            },
+            .Down => {
+                depth += num;
+            },
+            .Up => {
+                depth -= num;
+            },
+        }
+    }
 
-const min = std.math.min;
-const min3 = std.math.min3;
-const max = std.math.max;
-const max3 = std.math.max3;
+    return depth * distance;
+}
 
-const print = std.debug.print;
-const assert = std.debug.assert;
+fn part2(input: Str) !u32 {
+    _ = input;
+    var answer: u32 = 0;
+    return answer;
+}
 
-const sort = std.sort.sort;
-const asc = std.sort.asc;
-const desc = std.sort.desc;
+pub fn main() !void {
+    try util.runPart(part1, data);
+    print("\n", .{});
+    try util.runPart(part2, data);
+}
+
+test "2a" {
+    const input =
+        \\forward 5
+        \\down 5
+        \\forward 8
+        \\up 3
+        \\down 8
+        \\forward 2
+    ;
+    try std.testing.expectEqual(@as(u32, 150), try part1(input));
+}
