@@ -7,9 +7,29 @@ const data = @embedFile("../data/day01.txt");
 
 const Str = []const u8;
 
+pub const LineIter = struct {
+    _iter: std.mem.SplitIterator(u8),
+
+    const Self = @This();
+
+    pub fn init(input: Str) Self {
+        return .{ ._iter = std.mem.split(u8, input, "\n") };
+    }
+
+    pub fn next(self: *Self) ParseIntError!?u32 {
+        if (self._iter.next()) |line| {
+            const trimmed = std.mem.trim(u8, line, " \t\r");
+            if (trimmed.len == 0) return try self.next();
+            return try std.fmt.parseUnsigned(u32, trimmed, 10);
+        } else {
+            return null;
+        }
+    }
+};
+
 fn part1(input: Str) !u32 {
     var answer: u32 = 0;
-    var iter = util.LineIter.init(input);
+    var iter = LineIter.init(input);
     var prev_num: ?u32 = try iter.next();
     while (try iter.next()) |num| {
         if (num > prev_num.?) answer += 1;
@@ -20,7 +40,7 @@ fn part1(input: Str) !u32 {
 
 fn part2(input: Str) !u32 {
     var answer: u32 = 0;
-    var iter = util.LineIter.init(input);
+    var iter = LineIter.init(input);
     var num1: ?u32 = try iter.next();
     var num2: ?u32 = try iter.next();
     var num3: ?u32 = try iter.next();

@@ -1,44 +1,84 @@
 const std = @import("std");
-const Allocator = std.mem.Allocator;
-const List = std.ArrayList;
-const Map = std.AutoHashMap;
-const StrMap = std.StringHashMap;
-const BitSet = std.DynamicBitSet;
-const Str = []const u8;
+const assert = std.debug.assert;
+const print = std.debug.print;
 
 const util = @import("util.zig");
-const gpa = util.gpa;
-
 const data = @embedFile("../data/day03.txt");
 
-pub fn main() !void {
-    
+const Str = []const u8;
+
+fn part1(input: Str) !u32 {
+    const line_len = std.mem.indexOfScalar(u8, input, '\n').?;
+    var bit_counts: []u16 = try util.gpa.alloc(u16, line_len);
+    defer util.gpa.free(bit_counts);
+    for (bit_counts) |*count| count.* = 0;
+
+    var lines_iter = std.mem.split(u8, input, "\n");
+    var num_lines: u16 = 0;
+    while (lines_iter.next()) |line| {
+        num_lines += 1;
+        for (line) |ch, i| {
+            switch (ch) {
+                '1' => bit_counts[i] += 1,
+                '0' => {},
+                else => unreachable,
+            }
+        }
+    }
+    var gamma: u32 = 0;
+    for (bit_counts) |count, i| {
+        if (count > num_lines / 2) {
+            gamma += @as(u32, 1) << @intCast(u5, line_len - 1 - i);
+        }
+    }
+    const mask = (@as(u32, 1) << @intCast(u5, line_len)) - 1;
+    const eps = ~gamma & mask;
+    return gamma * eps;
 }
 
-// Useful stdlib functions
-const tokenize = std.mem.tokenize;
-const split = std.mem.split;
-const indexOf = std.mem.indexOfScalar;
-const indexOfAny = std.mem.indexOfAny;
-const indexOfStr = std.mem.indexOfPosLinear;
-const lastIndexOf = std.mem.lastIndexOfScalar;
-const lastIndexOfAny = std.mem.lastIndexOfAny;
-const lastIndexOfStr = std.mem.lastIndexOfLinear;
-const trim = std.mem.trim;
-const sliceMin = std.mem.min;
-const sliceMax = std.mem.max;
+fn part2(input: Str) !u32 {
+    _ = input;
+    return 0;
+}
 
-const parseInt = std.fmt.parseInt;
-const parseFloat = std.fmt.parseFloat;
+pub fn main() !void {
+    try util.runPart(part1, data);
+    print("\n", .{});
+    try util.runPart(part2, data);
+}
 
-const min = std.math.min;
-const min3 = std.math.min3;
-const max = std.math.max;
-const max3 = std.math.max3;
+test "3a" {
+    const input =
+        \\00100
+        \\11110
+        \\10110
+        \\10111
+        \\10101
+        \\01111
+        \\00111
+        \\11100
+        \\10000
+        \\11001
+        \\00010
+        \\01010
+    ;
+    try std.testing.expectEqual(@as(u32, 198), try part1(input));
+}
 
-const print = std.debug.print;
-const assert = std.debug.assert;
-
-const sort = std.sort.sort;
-const asc = std.sort.asc;
-const desc = std.sort.desc;
+// test "3b" {
+//     const input =
+//         \\00100
+//         \\11110
+//         \\10110
+//         \\10111
+//         \\10101
+//         \\01111
+//         \\00111
+//         \\11100
+//         \\10000
+//         \\11001
+//         \\00010
+//         \\01010
+//     ;
+//     try std.testing.expectEqual(@as(u32, 900), try part2(input));
+// }

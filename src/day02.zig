@@ -1,7 +1,6 @@
 const std = @import("std");
 const assert = std.debug.assert;
 const print = std.debug.print;
-const ParseIntError = std.fmt.ParseIntError;
 
 const util = @import("util.zig");
 const data = @embedFile("../data/day02.txt");
